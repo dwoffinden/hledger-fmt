@@ -831,6 +831,16 @@ fn save_transaction(data: &mut ParserTempData, journal: &mut Vec<JournalCstNode>
     data.max_entry_value_fourth_part_numeric_units_len = 0;
 }
 
+fn extract_numeric_units(units: &str) -> String {
+    match (
+        units.find(|c: char| c.is_ascii_digit()),
+        units.rfind(|c: char| c.is_ascii_digit()),
+    ) {
+        (Some(start), Some(end)) => units[start..=end].to_string(),
+        _ => String::new(),
+    }
+}
+
 fn split_number_in_units_decimal(value: &str) -> (String, String) {
     let mut units_rev = String::with_capacity(value.len());
     let mut decimal_rev = String::with_capacity(value.len());
@@ -1230,22 +1240,22 @@ impl EntryValueParser {
         }
 
         let (units, decimal) = split_number_in_units_decimal(&first_part_value);
-        self.first_part_numeric_units = units.chars().filter(|c| c.is_ascii_digit()).collect();
+        self.first_part_numeric_units = extract_numeric_units(&units);
         self.first_part_units = units;
         self.first_part_decimal = decimal;
 
         let (units, decimal) = split_number_in_units_decimal(&second_part_value);
-        self.second_part_numeric_units = units.chars().filter(|c| c.is_ascii_digit()).collect();
+        self.second_part_numeric_units = extract_numeric_units(&units);
         self.second_part_units = units;
         self.second_part_decimal = decimal;
 
         let (units, decimal) = split_number_in_units_decimal(&third_part_value);
-        self.third_part_numeric_units = units.chars().filter(|c| c.is_ascii_digit()).collect();
+        self.third_part_numeric_units = extract_numeric_units(&units);
         self.third_part_units = units;
         self.third_part_decimal = decimal;
 
         let (units, decimal) = split_number_in_units_decimal(&fourth_part_value);
-        self.fourth_part_numeric_units = units.chars().filter(|c| c.is_ascii_digit()).collect();
+        self.fourth_part_numeric_units = extract_numeric_units(&units);
         self.fourth_part_units = units;
         self.fourth_part_decimal = decimal;
 

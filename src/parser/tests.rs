@@ -11,6 +11,13 @@ fn assert_journal_err(content: &str, expected: SyntaxError) {
 }
 
 #[test]
+fn split_number() {
+    let (units, decimal) = split_number_in_units_decimal("$123.45");
+    assert_eq!(units, "$123");
+    assert_eq!(decimal, ".45");
+}
+
+#[test]
 fn single_line_comment_hash() {
     assert_journal(
         "# comment",
@@ -409,6 +416,74 @@ fn subdirective() {
                 DirectiveNode::Subdirective("subdirective foo bar".to_string()),
             ],
             max_name_content_len: 27,
+        }],
+    );
+}
+
+#[test]
+fn simple_transaction() {
+    assert_journal(
+        "2015-10-16 bought food
+  expenses:food  $1,234.56 @ 7,890.12 ABC =* $3,456.78
+  assets:cash",
+        vec![JournalCstNode::Transaction {
+            title: "2015-10-16 bought food".to_string(),
+            title_comment: None,
+            entries: vec![
+                TransactionNode::TransactionEntry(Box::new(TransactionEntry {
+                    name: "expenses:food".to_string(),
+                    value_first_part_units: "$1,234".to_string(),
+                    value_first_part_numeric_units: "1,234".to_string(),
+                    value_first_part_decimal: ".56".to_string(),
+                    value_first_separator: "@".to_string(),
+                    value_second_part_units: "7,890".to_string(),
+                    value_second_part_numeric_units: "7,890".to_string(),
+                    value_second_part_decimal: ".12ABC".to_string(),
+                    value_second_separator: "=*".to_string(),
+                    value_third_part_units: "$3,456".to_string(),
+                    value_third_part_numeric_units: "3,456".to_string(),
+                    value_third_part_decimal: ".78".to_string(),
+                    value_third_separator: "".to_string(),
+                    value_fourth_part_units: "".to_string(),
+                    value_fourth_part_numeric_units: "".to_string(),
+                    value_fourth_part_decimal: "".to_string(),
+                    comment: None,
+                })),
+                TransactionNode::TransactionEntry(Box::new(TransactionEntry {
+                    name: "assets:cash".to_string(),
+                    value_first_part_units: "".to_string(),
+                    value_first_part_numeric_units: "".to_string(),
+                    value_first_part_decimal: "".to_string(),
+                    value_first_separator: "".to_string(),
+                    value_second_part_units: "".to_string(),
+                    value_second_part_numeric_units: "".to_string(),
+                    value_second_part_decimal: "".to_string(),
+                    value_second_separator: "".to_string(),
+                    value_third_part_units: "".to_string(),
+                    value_third_part_numeric_units: "".to_string(),
+                    value_third_part_decimal: "".to_string(),
+                    value_third_separator: "".to_string(),
+                    value_fourth_part_units: "".to_string(),
+                    value_fourth_part_numeric_units: "".to_string(),
+                    value_fourth_part_decimal: "".to_string(),
+                    comment: None,
+                })),
+            ],
+            first_entry_indent: 2,
+            max_entry_name_len: 13,
+            max_entry_value_first_part_decimal_len: 3,
+            max_entry_value_first_part_numeric_units_len: 5,
+            max_entry_value_first_part_commodity_leading_len: 1,
+            max_entry_value_first_part_commodity_trailing_len: 0,
+            max_entry_value_first_separator_len: 1,
+            max_entry_value_second_part_decimal_len: 6,
+            max_entry_value_second_part_units_len: 5,
+            max_entry_value_second_part_commodity_leading_len: 0,
+            max_entry_value_second_separator_len: 2,
+            max_entry_value_third_part_decimal_len: 3,
+            max_entry_value_third_part_numeric_units_len: 5,
+            max_entry_value_third_separator_len: 0,
+            max_entry_value_fourth_part_numeric_units_len: 0,
         }],
     );
 }

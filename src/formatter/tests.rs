@@ -530,6 +530,33 @@ fn issue_32_unicode() {
 }
 
 #[test]
+fn issue_32_digit_group_marks() {
+    assert_noop_format(
+        r#"2025-01-01 Example transaction
+    assets:acc1    £10,000.00   @    $5,000  =*   $10,000
+    assets:acc2    £-1,000.00   @   $123      =*  £123
+    assets:acc3       £100.00
+    assets:acct4     £1000.00
+    equity
+
+2025-09-21 * Example transaction
+    a.bankaccount       -2.049,44
+    e.expanse              116,99
+    e.someotherexpanse   1.018,99
+    e.anotherexpanse         1,99
+    e.thirdexpanse
+
+2025-09-21 * Example transaction
+    a.bankaccount       -2 049,44
+    e.expanse              116,99
+    e.someotherexpanse   1 018,99
+    e.anotherexpanse         1,99
+    e.thirdexpanse
+"#,
+    );
+}
+
+#[test]
 fn subdirective() {
     assert_noop_format(
         r#"
